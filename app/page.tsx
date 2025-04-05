@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import translations from '@/data/translations.json';
+import Image from "next/image";
+import Link from "next/link";
+import translations from "@/data/translations.json";
 
 type Translation = {
   author: string;
   year: number;
   source: string;
-  link: string;
+  link: string; // this should now be just 'carter', 'higginson', etc.
 };
 
 export default function Home() {
@@ -22,6 +22,7 @@ export default function Home() {
           width={200}
           height={200}
           className="rounded-full mb-4"
+          priority // ✅ this fixes the LCP warning
         />
 
         {/* Title */}
@@ -29,7 +30,8 @@ export default function Home() {
 
         {/* Description */}
         <p className="max-w-xl mb-8 text-lg">
-          A short manual of Stoic ethical advice compiled by Arrian, based on the teachings of the Greek philosopher Epictetus.
+          A short manual of Stoic ethical advice compiled by Arrian, based on
+          the teachings of the Greek philosopher Epictetus.
         </p>
 
         {/* Section Title */}
@@ -40,7 +42,7 @@ export default function Home() {
           {(translations as Translation[]).map((t) => (
             <Link
               key={t.link}
-              href={t.link}
+              href={`/${t.link}/1`} // ✅ Add chapter 1 to make it a clickable route
               className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
             >
               {t.author} ({t.year})

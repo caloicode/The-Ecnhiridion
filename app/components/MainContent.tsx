@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { Dispatch, SetStateAction } from "react";
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import { useRouter, useParams } from 'next/navigation';
 
 type Props = {
   chapters: {
@@ -16,7 +16,7 @@ type Props = {
     year: number;
   };
   currentIndex: number;
-  setCurrentIndex: Dispatch<SetStateAction<number>>;
+  setCurrentIndex: (index: number) => void;
 };
 
 export default function MainContent({
@@ -27,6 +27,8 @@ export default function MainContent({
 }: Props) {
   const currentChapter = chapters[currentIndex];
   const contentRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { translator: translatorSlug, chapter: chapterParam } = useParams();
 
   // Scroll to top of content when chapter changes
   useEffect(() => {
@@ -35,12 +37,25 @@ export default function MainContent({
     }
   }, [currentIndex]);
 
+  useEffect(() => {
+    const chapterId = chapters[currentIndex]?.id;
+    const expectedPath = `/${translatorSlug}/${chapterId}`;
+    
+    if (typeof window !== 'undefined' && window.location.pathname !== expectedPath) {
+      window.history.replaceState(null, '', expectedPath);
+    }
+  }, [currentIndex, chapters, translatorSlug]);
+  
+  
+
   const nextChapter = () => {
-    setCurrentIndex((prev) => (prev + 1) % chapters.length);
+    const nextIndex = (currentIndex + 1) % chapters.length;
+    setCurrentIndex(nextIndex);
   };
 
   const prevChapter = () => {
-    setCurrentIndex((prev) => (prev === 0 ? chapters.length - 1 : prev - 1));
+    const prevIndex = currentIndex === 0 ? chapters.length - 1 : currentIndex - 1;
+    setCurrentIndex(prevIndex);
   };
 
   return (
