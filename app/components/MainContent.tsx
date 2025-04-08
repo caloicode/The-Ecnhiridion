@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 type Props = {
   chapters: {
@@ -27,7 +27,6 @@ export default function MainContent({
 }: Props) {
   const currentChapter = chapters[currentIndex];
   const contentRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const { translator: translatorSlug } = useParams();
 
   // Scroll to top when chapter changes

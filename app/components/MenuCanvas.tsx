@@ -26,7 +26,6 @@ export default function MenuCanvas({
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { translator } = useParams();
 
   const [isClient, setIsClient] = useState(false);
   const [visible, setVisible] = useState(false);

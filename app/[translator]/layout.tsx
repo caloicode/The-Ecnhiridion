@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { TranslatorContext } from '@/context/translator-context';
-import Loader from '@/app/components/Loader'; // ✅ added
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { TranslatorContext } from "@/context/translator-context";
+import Loader from "@/app/components/Loader"; // ✅ added
 
 export default function TranslatorLayout({
   children,
@@ -12,20 +12,29 @@ export default function TranslatorLayout({
 }) {
   const { translator } = useParams();
   const router = useRouter();
-  const [chapters, setChapters] = useState<any[]>([]);
+
+  type ChapterEntry = {
+    id: number;
+    chapter: string;
+    title: string;
+    translations: Record<string, string>;
+  };
+  const [chapters, setChapters] = useState<ChapterEntry[]>([]);
+
   const [hasFetched, setHasFetched] = useState(false);
+
 
   useEffect(() => {
     if (hasFetched || !translator) return;
 
-    fetch('/api/enchiridion')
+    fetch("/api/enchiridion")
       .then((res) => res.json())
       .then((json) => {
         if (
           !json?.data ||
           !json.data[0]?.translations?.[translator as string]
         ) {
-          router.replace('/carter/1');
+          router.replace("/carter/1");
           return;
         }
 
