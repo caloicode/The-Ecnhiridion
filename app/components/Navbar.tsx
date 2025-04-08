@@ -24,7 +24,7 @@ export default function Navbar({
       <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-zinc-900 shadow z-10 relative">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="https://placehold.co/32x32.png"
+            src="/logo.png"
             alt="logo"
             width={32}
             height={32}

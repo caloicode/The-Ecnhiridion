@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { TranslatorContext } from '@/context/translator-context';
+import Loader from '@/app/components/Loader'; // ✅ added
 
 export default function TranslatorLayout({
   children,
@@ -12,7 +13,7 @@ export default function TranslatorLayout({
   const { translator } = useParams();
   const router = useRouter();
   const [chapters, setChapters] = useState<any[]>([]);
-  const [hasFetched, setHasFetched] = useState(false); // ✅
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
     if (hasFetched || !translator) return;
@@ -29,14 +30,14 @@ export default function TranslatorLayout({
         }
 
         setChapters(json.data);
-        setHasFetched(true); // ✅ Prevent re-fetch
+        setHasFetched(true);
       });
-  }, [hasFetched, translator, router]); // ✅ depend only on hasFetched and translator
+  }, [hasFetched, translator, router]);
 
   if (!hasFetched || chapters.length === 0) {
     return (
-      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <Loader />
       </div>
     );
   }

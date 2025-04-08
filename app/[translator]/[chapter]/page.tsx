@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/app/components/Navbar';
 import MainContent from '@/app/components/MainContent';
 import { useTranslatorContext } from '@/context/translator-context';
+import Loader from '@/app/components/Loader'; // ✅ add this
 
 const TRANSLATOR_MAP: Record<string, { name: string; year: number }> = {
   carter: { name: 'Elizabeth Carter', year: 1750 },
@@ -19,7 +20,6 @@ export default function ChapterPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [initialized, setInitialized] = useState(false);
 
-  // Initialize currentIndex only once
   useEffect(() => {
     if (!initialized && chapter && chapters.length > 0) {
       const idx = chapters.findIndex((entry) => String(entry.id) === String(chapter));
@@ -44,19 +44,35 @@ export default function ChapterPage() {
     title,
   }));
 
+  if (!initialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
-      <Navbar
-        currentTranslation={selectedTranslator}
-        chapterList={chapterList}
-        setCurrentIndex={setCurrentIndex}
-      />
-      <MainContent
-        chapters={contentChapters}
-        currentIndex={currentIndex}
-        setCurrentIndex={setCurrentIndex}
-        translator={translatorInfo}
-      />
+    <div
+      className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url('/background.jpg')`,
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="bg-white/20 dark:bg-black/60 min-h-screen">
+        <Navbar
+          currentTranslation={selectedTranslator}
+          chapterList={chapterList}
+          setCurrentIndex={setCurrentIndex}
+        />
+        <MainContent
+          chapters={contentChapters}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+          translator={translatorInfo}
+        />
+      </div>
     </div>
   );
 }

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useRef } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { useRouter, useParams } from "next/navigation";
 
 type Props = {
   chapters: {
@@ -28,25 +28,26 @@ export default function MainContent({
   const currentChapter = chapters[currentIndex];
   const contentRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { translator: translatorSlug, chapter: chapterParam } = useParams();
+  const { translator: translatorSlug } = useParams();
 
-  // Scroll to top of content when chapter changes
+  // Scroll to top when chapter changes
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollTop = 0;
     }
   }, [currentIndex]);
 
+  // Update URL without reload
   useEffect(() => {
     const chapterId = chapters[currentIndex]?.id;
     const expectedPath = `/${translatorSlug}/${chapterId}`;
-    
-    if (typeof window !== 'undefined' && window.location.pathname !== expectedPath) {
-      window.history.replaceState(null, '', expectedPath);
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname !== expectedPath
+    ) {
+      window.history.replaceState(null, "", expectedPath);
     }
   }, [currentIndex, chapters, translatorSlug]);
-  
-  
 
   const nextChapter = () => {
     const nextIndex = (currentIndex + 1) % chapters.length;
@@ -54,15 +55,43 @@ export default function MainContent({
   };
 
   const prevChapter = () => {
-    const prevIndex = currentIndex === 0 ? chapters.length - 1 : currentIndex - 1;
+    const prevIndex =
+      currentIndex === 0 ? chapters.length - 1 : currentIndex - 1;
     setCurrentIndex(prevIndex);
+  };
+
+  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!contentRef.current) return;
+    const rect = contentRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    if (clickX < width * 0.3) prevChapter();
+    else if (clickX > width * 0.7) nextChapter();
   };
 
   return (
     <div className="flex justify-center items-center py-8 px-4">
-      <div className="max-w-screen-md w-full flex flex-col items-center gap-4">
+      <div className="w-full max-w-[600px] flex flex-col items-center gap-4 relative">
+        {/* Top Right Arrows */}
+        <div className="absolute right-0 -top-6 flex gap-2 mb-2">
+          <button
+            onClick={prevChapter}
+            className="p-1 rounded-full bg-gray-200/80 dark:bg-zinc-700/80 hover:bg-gray-300 dark:hover:bg-zinc-600 transition backdrop-blur-sm"
+            aria-label="Previous Chapter"
+          >
+            <ChevronLeftIcon className="w-5 h-5 text-gray-700 dark:text-white" />
+          </button>
+          <button
+            onClick={nextChapter}
+            className="p-1 rounded-full bg-gray-200/80 dark:bg-zinc-700/80 hover:bg-gray-300 dark:hover:bg-zinc-600 transition backdrop-blur-sm"
+            aria-label="Next Chapter"
+          >
+            <ChevronRightIcon className="w-5 h-5 text-gray-700 dark:text-white" />
+          </button>
+        </div>
+
         {/* Chapter Title */}
-        <h2 className="text-xl md:text-2xl font-semibold text-center">
+        <h2 className="text-xl md:text-2xl font-semibold text-center mt-4">
           {currentChapter.chapter}. {currentChapter.title}
         </h2>
 
@@ -71,36 +100,18 @@ export default function MainContent({
           Translation by: {translator.name} ({translator.year})
         </p>
 
-        {/* Nav Buttons */}
-        <div className="flex justify-between items-center gap-6 mt-2">
-          <button
-            onClick={prevChapter}
-            className="p-2 rounded-full bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600 transition"
-            aria-label="Previous Chapter"
-          >
-            <ChevronLeftIcon className="w-5 h-5 text-gray-700 dark:text-white" />
-          </button>
-          <button
-            onClick={nextChapter}
-            className="p-2 rounded-full bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600 transition"
-            aria-label="Next Chapter"
-          >
-            <ChevronRightIcon className="w-5 h-5 text-gray-700 dark:text-white" />
-          </button>
-        </div>
+ {/* Content Card with Glass Effect and Max Height */}
+<div
+  ref={contentRef}
+  onClick={handleContentClick}
+  className="w-full max-h-[60vh] overflow-y-auto rounded-xl p-6 cursor-default border border-white/30 dark:border-zinc-600/30 bg-white/30 dark:bg-zinc-800/30 backdrop-blur-sm shadow-lg transition-all hover:shadow-xl"
+>
+  <div
+    className="prose dark:prose-invert prose-sm max-w-none"
+    dangerouslySetInnerHTML={{ __html: currentChapter.content }}
+  />
+</div>
 
-        {/* Content Card */}
-        <div
-          ref={contentRef}
-          className="bg-white dark:bg-zinc-800 shadow rounded-lg max-w-full md:max-w-[30vw] w-full max-h-[60vh] overflow-y-auto p-4"
-        >
-          <div
-            className="prose dark:prose-invert prose-sm"
-            dangerouslySetInnerHTML={{
-              __html: currentChapter.content,
-            }}
-          />
-        </div>
       </div>
     </div>
   );
